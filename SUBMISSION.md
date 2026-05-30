@@ -68,3 +68,22 @@ C:\N8RO\data\resources\missions\human_animation_loop.lua
 ```
 
 If the animation codes do not appear in Scenario Editor, add `Zeynep Walk` and `Zeynep Squat` to the platform's Animation Component list, then assign one of them to the human entity.
+
+## Runtime Verification
+
+The deployed DLL writes a short verification log at:
+
+```text
+C:\N8RO\userPlugins\sim\character_plugin_220201014_runtime.log
+```
+
+During the final N8RO run, the plugin was loaded and both custom states were evaluated by the simulation host:
+
+```text
+registered animationCode="Zeynep Walk"
+registered animationCode="Zeynep Squat"
+evaluate activeAnimationCode="Zeynep Walk" t=0.05 overrides=10
+evaluate activeAnimationCode="Zeynep Squat" t=5.05 overrides=10
+```
+
+This confirms that the custom plugin is active and returns 10 joint overrides for both implemented motion states.
