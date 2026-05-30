@@ -146,23 +146,23 @@ public:
 
         if (isSquatAnimationCode(input.entity.activeAnimationCode)) {
             const double t = input.simulationTimeSeconds;
-            const double pulse = std::sin(t * 3.8);
-            const double counter_pulse = std::sin(t * 5.1 + 1.4);
-            const double shoulder_lift = 1.35 + pulse * 0.75;
-            const double elbow_bend = 2.20 + counter_pulse * 0.65;
-            const double knee_bend = 1.55 + pulse * 0.45;
-            const double ankle_counter = -0.95 + counter_pulse * 0.35;
+            const double squat = 0.5 + 0.5 * std::sin(t * 2.0);
+            const double balance = std::sin(t * 2.8 + 0.6);
+            const double shoulder_lift = 0.85 + balance * 0.22;
+            const double elbow_bend = 0.95 + squat * 0.35;
+            const double knee_bend = 0.70 + squat * 0.42;
+            const double ankle_counter = -0.32 - squat * 0.18;
 
-            addJointOverride(output, available_joints, "leftHip", -0.85, pulse * 0.35, counter_pulse * 0.45);
-            addJointOverride(output, available_joints, "rightHip", -0.85, -pulse * 0.35, -counter_pulse * 0.45);
+            addJointOverride(output, available_joints, "leftHip", -0.50 - squat * 0.18, balance * 0.08, 1.05);
+            addJointOverride(output, available_joints, "rightHip", -0.50 - squat * 0.18, -balance * 0.08, -1.05);
             addJointOverride(output, available_joints, "leftKnee", knee_bend, 0.0, 0.0);
             addJointOverride(output, available_joints, "rightKnee", knee_bend, 0.0, 0.0);
             addJointOverride(output, available_joints, "leftAnkle", ankle_counter, 0.0, 0.0);
             addJointOverride(output, available_joints, "rightAnkle", ankle_counter, 0.0, 0.0);
-            addJointOverride(output, available_joints, "leftShoulder", shoulder_lift, counter_pulse * 0.65, -1.25 + pulse * 0.80);
-            addJointOverride(output, available_joints, "rightShoulder", shoulder_lift, -counter_pulse * 0.65, 1.25 - pulse * 0.80);
-            addJointOverride(output, available_joints, "leftElbow", elbow_bend, pulse * 0.40, -0.75);
-            addJointOverride(output, available_joints, "rightElbow", elbow_bend, -pulse * 0.40, 0.75);
+            addJointOverride(output, available_joints, "leftShoulder", shoulder_lift, balance * 0.18, -1.25 + balance * 0.20);
+            addJointOverride(output, available_joints, "rightShoulder", shoulder_lift, -balance * 0.18, 1.25 - balance * 0.20);
+            addJointOverride(output, available_joints, "leftElbow", elbow_bend, balance * 0.08, -0.25);
+            addJointOverride(output, available_joints, "rightElbow", elbow_bend, -balance * 0.08, 0.25);
             writeEvaluateSample(input.entity.activeAnimationCode, input.simulationTimeSeconds, output.jointOverrides.size());
             return !output.jointOverrides.empty();
         }
@@ -183,16 +183,16 @@ public:
         const double right_lift = std::max(0.0, -proof_step);
 
         // NathanHuman needs these mirrored Z offsets; the larger swing makes the DLL easy to verify in GLB.
-        addJointOverride(output, available_joints, "leftHip", -0.25 + left_hip * 1.45 + left_lift * 0.70, arm_wave * 0.18, 1.10 + proof_step * 0.20);
-        addJointOverride(output, available_joints, "rightHip", -0.25 + right_hip * 1.45 + right_lift * 0.70, -arm_wave * 0.18, -1.10 + proof_step * 0.20);
-        addJointOverride(output, available_joints, "leftKnee", 0.15 + left_knee * 1.40 + left_lift * 0.85, 0.0, 0.0);
-        addJointOverride(output, available_joints, "rightKnee", 0.15 + right_knee * 1.40 + right_lift * 0.85, 0.0, 0.0);
-        addJointOverride(output, available_joints, "leftAnkle", -0.20 + left_ankle * 0.95 - left_lift * 0.35, 0.0, 0.0);
-        addJointOverride(output, available_joints, "rightAnkle", -0.20 + right_ankle * 0.95 - right_lift * 0.35, 0.0, 0.0);
-        addJointOverride(output, available_joints, "leftShoulder", 1.45 + left_shoulder * 1.20 - proof_step * 0.95, arm_wave * 0.55, -1.60 - proof_step * 0.70);
-        addJointOverride(output, available_joints, "rightShoulder", 1.45 + right_shoulder * 1.20 + proof_step * 0.95, -arm_wave * 0.55, 1.60 - proof_step * 0.70);
-        addJointOverride(output, available_joints, "leftElbow", 1.10 + left_elbow * 0.85 + right_lift * 0.45, arm_wave * 0.35, -0.45);
-        addJointOverride(output, available_joints, "rightElbow", 1.10 + right_elbow * 0.85 + left_lift * 0.45, -arm_wave * 0.35, 0.45);
+        addJointOverride(output, available_joints, "leftHip", -0.12 + left_hip * 0.95 + left_lift * 0.20, arm_wave * 0.06, 1.05);
+        addJointOverride(output, available_joints, "rightHip", -0.12 + right_hip * 0.95 + right_lift * 0.20, -arm_wave * 0.06, -1.05);
+        addJointOverride(output, available_joints, "leftKnee", 0.10 + left_knee * 1.05 + left_lift * 0.22, 0.0, 0.0);
+        addJointOverride(output, available_joints, "rightKnee", 0.10 + right_knee * 1.05 + right_lift * 0.22, 0.0, 0.0);
+        addJointOverride(output, available_joints, "leftAnkle", -0.12 + left_ankle * 0.75 - left_lift * 0.10, 0.0, 0.0);
+        addJointOverride(output, available_joints, "rightAnkle", -0.12 + right_ankle * 0.75 - right_lift * 0.10, 0.0, 0.0);
+        addJointOverride(output, available_joints, "leftShoulder", 1.05 + left_shoulder * 0.75 - proof_step * 0.38, arm_wave * 0.12, -1.35 - proof_step * 0.22);
+        addJointOverride(output, available_joints, "rightShoulder", 1.05 + right_shoulder * 0.75 + proof_step * 0.38, -arm_wave * 0.12, 1.35 - proof_step * 0.22);
+        addJointOverride(output, available_joints, "leftElbow", 0.65 + left_elbow * 0.55 + right_lift * 0.15, arm_wave * 0.08, -0.15);
+        addJointOverride(output, available_joints, "rightElbow", 0.65 + right_elbow * 0.55 + left_lift * 0.15, -arm_wave * 0.08, 0.15);
 
         writeEvaluateSample(input.entity.activeAnimationCode, input.simulationTimeSeconds, output.jointOverrides.size());
         return !output.jointOverrides.empty();
