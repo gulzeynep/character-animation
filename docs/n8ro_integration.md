@@ -78,6 +78,7 @@ At runtime it registers an animation model extension for:
 - model type: `animationModelNathanHuman`
 - animation code: `Zeynep Walk`
 - animation code: `Zeynep Squat`
+- compatibility aliases: `Idle Neutral`, `Idle Breathing`, `Idle Alert`, `Idle Shake`, `Idle Stopped`
 
 If the custom codes do not appear in the Scenario Editor, add `Zeynep Walk` and `Zeynep Squat` to the platform's Animation Component list, then assign one of them to the human entity.
 

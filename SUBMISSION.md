@@ -11,6 +11,8 @@ The plugin registers two custom animation states for `animationModelNathanHuman`
 - `Zeynep Walk`: a phase-based walking motion.
 - `Zeynep Squat`: a squat / arm-balance motion.
 
+For compatibility with the current N8RO scenario UI, the plugin also registers the built-in animation codes as aliases. If the scenario stays on `Idle Neutral`, the plugin still drives the same 10-joint walking model instead of leaving the character static.
+
 The mission override in `n8ro_overrides/human_animation_loop.lua` switches between these two states every 4 seconds.
 
 ## Controlled Joints

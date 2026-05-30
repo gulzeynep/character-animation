@@ -92,6 +92,8 @@ The plugin registers two custom motion states for `animationModelNathanHuman`:
 - `Zeynep Walk`: phase-based 10-joint walking motion.
 - `Zeynep Squat`: 10-joint squat / arm-balance motion.
 
+It also registers the built-in Nathan animation codes as compatibility aliases, so the custom model still drives the character if the current N8RO UI leaves the entity on `Idle Neutral`.
+
 The mission override in `n8ro_overrides/human_animation_loop.lua` switches between these two custom animation codes every 4 seconds.
 
 See `docs/n8ro_integration.md` for the current exported DLL functions.

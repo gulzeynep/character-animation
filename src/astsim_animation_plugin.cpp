@@ -21,9 +21,14 @@ constexpr std::string_view kPluginId = "character_plugin_220201014";
 constexpr std::string_view kModelType = "animationModelNathanHuman";
 constexpr std::string_view kWalkAnimationCode = "Zeynep Walk";
 constexpr std::string_view kSquatAnimationCode = "Zeynep Squat";
-constexpr std::array<std::string_view, 2> kAnimationCodes{
+constexpr std::array<std::string_view, 7> kAnimationCodes{
     kWalkAnimationCode,
     kSquatAnimationCode,
+    "Idle Neutral",
+    "Idle Breathing",
+    "Idle Alert",
+    "Idle Shake",
+    "Idle Stopped",
 };
 
 bool equals(std::string_view left, const std::string& right)
