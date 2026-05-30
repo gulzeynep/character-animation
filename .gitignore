@@ -1,0 +1,16 @@
+build/
+cmake-build-*/
+.idea/
+.vs/
+*.user
+*.suo
+*.log
+*.dll
+*.exe
+*.lib
+*.pdb
+*.obj
+delivery/clean_submission_package/
+delivery/submission_package/
+delivery/*.zip
+!release/*.dll
