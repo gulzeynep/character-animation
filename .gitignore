@@ -13,4 +13,5 @@ cmake-build-*/
 delivery/clean_submission_package/
 delivery/submission_package/
 delivery/*.zip
+n8ro_reinstall_backup/
 !release/*.dll
