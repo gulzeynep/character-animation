@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -22,6 +23,7 @@ constexpr std::string_view kPluginId = "character_plugin_220201014";
 constexpr std::string_view kModelType = "animationModelNathanHuman";
 constexpr std::string_view kWalkAnimationCode = "Zeynep Walk";
 constexpr std::string_view kSquatAnimationCode = "Zeynep Squat";
+constexpr const char* kRuntimeLogPath = "C:\\N8RO\\userPlugins\\sim\\character_plugin_220201014_runtime.log";
 constexpr std::array<std::string_view, 7> kAnimationCodes{
     kWalkAnimationCode,
     kSquatAnimationCode,
@@ -46,6 +48,30 @@ bool isHandledAnimationCode(const std::string& animation_code)
     }
 
     return false;
+}
+
+void writeRuntimeLog(const std::string& line)
+{
+    std::ofstream log(kRuntimeLogPath, std::ios::app);
+    if (log) {
+        log << line << '\n';
+    }
+}
+
+void writeEvaluateSample(const std::string& animation_code, double time_seconds, std::size_t override_count)
+{
+    static int sample_counter = 0;
+    ++sample_counter;
+    if (sample_counter % 50 != 1) {
+        return;
+    }
+
+    std::ofstream log(kRuntimeLogPath, std::ios::app);
+    if (log) {
+        log << "evaluate activeAnimationCode=\"" << animation_code
+            << "\" t=" << time_seconds
+            << " overrides=" << override_count << '\n';
+    }
 }
 
 bool hasJoint(const std::unordered_set<std::string>& joints, const char* joint_id)
@@ -127,6 +153,7 @@ public:
             addJointOverride(output, available_joints, "rightShoulder", 1.10 - arm * 0.25, 0.0, 1.35 - arm * 0.35);
             addJointOverride(output, available_joints, "leftElbow", 0.75 + squat * 0.35, arm * 0.15, -0.25);
             addJointOverride(output, available_joints, "rightElbow", 0.75 + squat * 0.35, -arm * 0.15, 0.25);
+            writeEvaluateSample(input.entity.activeAnimationCode, input.simulationTimeSeconds, output.jointOverrides.size());
             return !output.jointOverrides.empty();
         }
 
@@ -156,6 +183,7 @@ public:
         addJointOverride(output, available_joints, "leftElbow", 0.60 + left_elbow * 0.65 + right_lift * 0.25, 0.0, -0.20);
         addJointOverride(output, available_joints, "rightElbow", 0.60 + right_elbow * 0.65 + left_lift * 0.25, 0.0, 0.20);
 
+        writeEvaluateSample(input.entity.activeAnimationCode, input.simulationTimeSeconds, output.jointOverrides.size());
         return !output.jointOverrides.empty();
     }
 
@@ -181,6 +209,13 @@ public:
 
     void initialize(arkheon::astlib::PluginContext& context) override
     {
+        {
+            std::ofstream log(kRuntimeLogPath, std::ios::trunc);
+            if (log) {
+                log << "initialize pluginId=" << kPluginId << '\n';
+            }
+        }
+
         initialized_ = true;
         shutdown_ = false;
         plugin_id_ = context.metadata.pluginId();
@@ -238,6 +273,7 @@ private:
             []() { return std::make_unique<ComWalkAnimationModel>(); });
 
         if (registered) {
+            writeRuntimeLog(std::string("registered animationCode=\"") + animation_code + "\"");
             registered_animation_codes_.push_back(std::move(animation_code));
         }
     }
