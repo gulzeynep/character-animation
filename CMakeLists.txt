@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(N8RO_MOTION_BUILD_TESTS "Build controller safety tests" ON)
-set(N8RO_RELEASE_ROOT "C:/N8RO" CACHE PATH "N8RO release root that contains include, lib, and userPlugins folders")
+set(N8RO_RELEASE_ROOT "C:/N8RO2" CACHE PATH "N8RO release root that contains include, lib, and userPlugins folders")
 
 add_library(n8ro_motion_core STATIC
     src/motion_controller.cpp

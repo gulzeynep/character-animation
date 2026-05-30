@@ -58,13 +58,13 @@ Close N8RO before compiling or replacing the DLL.
 Copy the plugin DLL to:
 
 ```text
-C:\N8RO\userPlugins\sim\character_plugin_220201014.dll
+C:\N8RO2\userPlugins\sim\character_plugin_220201014.dll
 ```
 
 Copy the mission override to:
 
 ```text
-C:\N8RO\data\resources\missions\human_animation_loop.lua
+C:\N8RO2\data\resources\missions\human_animation_loop.lua
 ```
 
 If the animation codes do not appear in Scenario Editor, add `Zeynep Walk` and `Zeynep Squat` to the platform's Animation Component list, then assign one of them to the human entity.
@@ -74,7 +74,7 @@ If the animation codes do not appear in Scenario Editor, add `Zeynep Walk` and `
 The deployed DLL writes a short verification log at:
 
 ```text
-C:\N8RO\userPlugins\sim\character_plugin_220201014_runtime.log
+C:\N8RO2\userPlugins\sim\character_plugin_220201014_runtime.log
 ```
 
 During the final N8RO run, the plugin was loaded and both custom states were evaluated by the simulation host:

@@ -2,6 +2,7 @@
 
 #include <model/AnimationModel.h>
 #include <model/IModel.h>
+#include <model/ModelFactoryRegistry.h>
 #include <plugin/IModelPluginService.h>
 #include <plugin/IPlugin.h>
 #include <plugin/IPluginServices.h>
@@ -23,7 +24,7 @@ constexpr std::string_view kPluginId = "character_plugin_220201014";
 constexpr std::string_view kModelType = "animationModelNathanHuman";
 constexpr std::string_view kWalkAnimationCode = "Zeynep Walk";
 constexpr std::string_view kSquatAnimationCode = "Zeynep Squat";
-constexpr const char* kRuntimeLogPath = "C:\\N8RO\\userPlugins\\sim\\character_plugin_220201014_runtime.log";
+constexpr const char* kRuntimeLogPath = "C:\\N8RO2\\userPlugins\\sim\\character_plugin_220201014_runtime.log";
 constexpr std::array<std::string_view, 7> kAnimationCodes{
     kWalkAnimationCode,
     kSquatAnimationCode,
@@ -112,6 +113,11 @@ public:
     [[nodiscard]] std::string getTypeName() const override
     {
         return "simCharAnimComWalkModel";
+    }
+
+    [[nodiscard]] std::unique_ptr<arkheon::astsim::IModel> clone() const override
+    {
+        return std::make_unique<ComWalkAnimationModel>(*this);
     }
 
     [[nodiscard]] bool evaluate(const arkheon::astsim::AnimationModelInput& input,
@@ -228,18 +234,27 @@ public:
             plugin_id_ = std::string(kPluginId);
         }
 
-        model_plugin_service_ = nullptr;
+        model_factory_registry_ = nullptr;
         if (context.services != nullptr) {
             auto* service = context.services->getService(arkheon::astsim::IModelPluginService::kPluginServiceId);
-            model_plugin_service_ = static_cast<arkheon::astsim::IModelPluginService*>(service);
+            auto* model_plugin_service = static_cast<arkheon::astsim::IModelPluginService*>(service);
+            model_factory_registry_ = model_plugin_service != nullptr ? &model_plugin_service->modelFactoryRegistry() : nullptr;
         }
 
-        if (model_plugin_service_ == nullptr) {
+        if (model_factory_registry_ == nullptr) {
+            writeRuntimeLog("model factory registry not available");
+            return;
+        }
+
+        auto* prototype_base = model_factory_registry_->getRegisteredPrototype(kModelType);
+        auto* prototype_animation_model = dynamic_cast<arkheon::astsim::IAnimationModel*>(prototype_base);
+        if (prototype_animation_model == nullptr) {
+            writeRuntimeLog("animationModelNathanHuman prototype not available");
             return;
         }
 
         for (const auto animation_code : kAnimationCodes) {
-            registerAnimationCode(std::string(animation_code));
+            registerAnimationCode(*prototype_animation_model, std::string(animation_code));
         }
     }
 
@@ -253,29 +268,33 @@ public:
 
     void shutdown() override
     {
-        if (model_plugin_service_ != nullptr) {
+        if (model_factory_registry_ != nullptr) {
+            auto* prototype_base = model_factory_registry_->getRegisteredPrototype(kModelType);
+            auto* prototype_animation_model = dynamic_cast<arkheon::astsim::IAnimationModel*>(prototype_base);
             for (const auto& animation_code : registered_animation_codes_) {
-                static_cast<void>(model_plugin_service_->unregisterModelExtensionFactory(
-                    plugin_id_,
-                    kModelType,
-                    animation_code));
+                if (prototype_animation_model != nullptr) {
+                    static_cast<void>(prototype_animation_model->registerAnimation(
+                        animation_code,
+                        arkheon::astsim::IAnimationModel::AnimationEvaluationFunction{}));
+                }
             }
-            static_cast<void>(model_plugin_service_->releasePluginModels(plugin_id_));
         }
 
         registered_animation_codes_.clear();
-        model_plugin_service_ = nullptr;
+        model_factory_registry_ = nullptr;
         shutdown_ = true;
     }
 
 private:
-    void registerAnimationCode(std::string animation_code)
+    void registerAnimationCode(arkheon::astsim::IAnimationModel& prototype_animation_model, std::string animation_code)
     {
-        const bool registered = model_plugin_service_->registerModelExtensionFactory(
-            plugin_id_,
-            kModelType,
+        const bool registered = prototype_animation_model.registerAnimation(
             animation_code,
-            []() { return std::make_unique<ComWalkAnimationModel>(); });
+            [](const arkheon::astsim::AnimationModelInput& input,
+               arkheon::astsim::AnimationModelOutput& output) {
+                thread_local ComWalkAnimationModel model;
+                return model.evaluate(input, output);
+            });
 
         if (registered) {
             writeRuntimeLog(std::string("registered animationCode=\"") + animation_code + "\"");
@@ -286,7 +305,7 @@ private:
     bool initialized_ = false;
     bool shutdown_ = false;
     std::string plugin_id_ = std::string(kPluginId);
-    arkheon::astsim::IModelPluginService* model_plugin_service_ = nullptr;
+    arkheon::astsim::ModelFactoryRegistry* model_factory_registry_ = nullptr;
     std::vector<std::string> registered_animation_codes_;
 };
 

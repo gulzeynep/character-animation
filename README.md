@@ -81,6 +81,12 @@ The visible Scenario Editor animation flow uses sim plugins from:
 C:\N8RO\userPlugins\sim
 ```
 
+For the current N8RO2 install, configure CMake with:
+
+```powershell
+cmake -S . -B build -DN8RO_RELEASE_ROOT=C:/N8RO2
+```
+
 For that flow, use:
 
 ```text
