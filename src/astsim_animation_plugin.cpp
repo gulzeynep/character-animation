@@ -7,6 +7,7 @@
 #include <plugin/IPluginServices.h>
 #include <plugin/PluginContext.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <memory>
@@ -139,18 +140,21 @@ public:
         const double right_shoulder = angle(angles, n8ro_motion::JointIndex::RightShoulderPitch);
         const double left_elbow = angle(angles, n8ro_motion::JointIndex::LeftElbowPitch);
         const double right_elbow = angle(angles, n8ro_motion::JointIndex::RightElbowPitch);
+        const double proof_step = std::sin(input.simulationTimeSeconds * 4.2);
+        const double left_lift = std::max(0.0, proof_step);
+        const double right_lift = std::max(0.0, -proof_step);
 
-        // NathanHuman sample plugins use mirrored Z offsets to align limbs from the bind pose.
-        addJointOverride(output, available_joints, "leftHip", -0.10 + left_hip * 0.70, left_hip * 0.10, 1.10);
-        addJointOverride(output, available_joints, "rightHip", -0.10 + right_hip * 0.70, -right_hip * 0.10, -1.10);
-        addJointOverride(output, available_joints, "leftKnee", 0.10 + left_knee * 0.85, 0.0, 0.0);
-        addJointOverride(output, available_joints, "rightKnee", 0.10 + right_knee * 0.85, 0.0, 0.0);
-        addJointOverride(output, available_joints, "leftAnkle", -0.10 + left_ankle * 0.65, 0.0, 0.0);
-        addJointOverride(output, available_joints, "rightAnkle", -0.10 + right_ankle * 0.65, 0.0, 0.0);
-        addJointOverride(output, available_joints, "leftShoulder", 1.20 + left_shoulder * 0.40, 0.0, -1.45 + left_shoulder * 0.35);
-        addJointOverride(output, available_joints, "rightShoulder", 1.20 + right_shoulder * 0.40, 0.0, 1.45 - right_shoulder * 0.35);
-        addJointOverride(output, available_joints, "leftElbow", 0.55 + left_elbow * 0.45, 0.0, -0.15);
-        addJointOverride(output, available_joints, "rightElbow", 0.55 + right_elbow * 0.45, 0.0, 0.15);
+        // NathanHuman needs these mirrored Z offsets; the larger swing makes the DLL easy to verify in GLB.
+        addJointOverride(output, available_joints, "leftHip", -0.18 + left_hip * 1.15 + left_lift * 0.35, left_hip * 0.12, 1.10);
+        addJointOverride(output, available_joints, "rightHip", -0.18 + right_hip * 1.15 + right_lift * 0.35, -right_hip * 0.12, -1.10);
+        addJointOverride(output, available_joints, "leftKnee", 0.12 + left_knee * 1.20 + left_lift * 0.45, 0.0, 0.0);
+        addJointOverride(output, available_joints, "rightKnee", 0.12 + right_knee * 1.20 + right_lift * 0.45, 0.0, 0.0);
+        addJointOverride(output, available_joints, "leftAnkle", -0.12 + left_ankle * 0.80 - left_lift * 0.20, 0.0, 0.0);
+        addJointOverride(output, available_joints, "rightAnkle", -0.12 + right_ankle * 0.80 - right_lift * 0.20, 0.0, 0.0);
+        addJointOverride(output, available_joints, "leftShoulder", 1.25 + left_shoulder * 0.95 - proof_step * 0.65, 0.0, -1.50 - proof_step * 0.35);
+        addJointOverride(output, available_joints, "rightShoulder", 1.25 + right_shoulder * 0.95 + proof_step * 0.65, 0.0, 1.50 - proof_step * 0.35);
+        addJointOverride(output, available_joints, "leftElbow", 0.60 + left_elbow * 0.65 + right_lift * 0.25, 0.0, -0.20);
+        addJointOverride(output, available_joints, "rightElbow", 0.60 + right_elbow * 0.65 + left_lift * 0.25, 0.0, 0.20);
 
         return !output.jointOverrides.empty();
     }
